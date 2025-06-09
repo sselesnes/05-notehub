@@ -44,7 +44,7 @@ export default function App() {
       {isLoading && <LoadingSpinner />}
       {error && <ErrorMessage message={error.message} />}
       {data?.notes && data.notes.length > 0 && <NoteList notes={data.notes} />}
-      {data?.notes && data.notes.length === 0 && <p>Нічого не знайдено</p>}
+      {data?.notes && data.notes.length === 0 && <p>Nothing found</p>}
       {isModalOpen && <NoteModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
