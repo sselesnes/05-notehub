@@ -1,6 +1,11 @@
 import css from "./Pagination.module.css";
 import ReactPaginate from "react-paginate";
-import type { PaginationProps } from "../../types/note";
+
+export interface PaginationProps {
+  pageCount: number;
+  onPageChange: (selectedItem: { selected: number }) => void;
+  currentPage: number;
+}
 
 export default function Pagination({ pageCount, onPageChange, currentPage }: PaginationProps) {
   if (pageCount <= 1) {

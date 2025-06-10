@@ -17,9 +17,12 @@ export default function App() {
   const [debouncedQuery] = useDebounce(searchQuery, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data, isLoading, error } = useQuery<FetchNotesResponse | undefined, Error>({
-    queryKey: ["notes", page, debouncedQuery],
+  const { data, isLoading, error } = useQuery<FetchNotesResponse, Error>({
+    queryKey: ["notes", { page, query: debouncedQuery }],
     queryFn: () => fetchNotes({ page, query: debouncedQuery, perPage: 12 }),
+    placeholderData: previousData =>
+      previousData && previousData.page !== page ? previousData : undefined,
+    // previousQuery та keepPreviousData не використовується у tanstack/react-query v5.+
   });
 
   const handlePageChange = (selectedItem: { selected: number }) => {

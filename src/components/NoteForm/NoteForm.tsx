@@ -3,8 +3,12 @@ import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { createNote } from "../../services/noteService";
-import type { CreateNoteParams, NoteModalProps } from "../../types/note";
+import type { CreateNoteParams } from "../../types/note";
 import { useId } from "react";
+
+interface NoteFormProps {
+  onClose: () => void;
+}
 
 const validationSchema = Yup.object({
   title: Yup.string()
@@ -12,10 +16,10 @@ const validationSchema = Yup.object({
     .max(50, "Maximum 50 characters")
     .required("Title is required"),
   content: Yup.string().max(500, "Maximum 500 characters"),
-  tag: Yup.string().oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"]),
+  tag: Yup.string().oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"], "Invalid tag"),
 });
 
-export default function NoteForm({ onClose }: NoteModalProps) {
+export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
   const titleId = useId();
   const contentId = useId();
@@ -50,7 +54,7 @@ export default function NoteForm({ onClose }: NoteModalProps) {
               id={contentId}
               name="content"
               as="textarea"
-              rows="8"
+              rows={8}
               className={css.textarea}
             />
             <ErrorMessage name="content" component="span" className={css.error} />
@@ -65,6 +69,7 @@ export default function NoteForm({ onClose }: NoteModalProps) {
               <option value="Meeting">Meeting</option>
               <option value="Shopping">Shopping</option>
             </Field>
+            <ErrorMessage name="tag" component="span" className={css.error} />
           </div>
 
           <div className={css.actions}>
