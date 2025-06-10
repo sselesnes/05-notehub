@@ -1,6 +1,6 @@
 import css from "./App.module.css";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
@@ -20,15 +20,13 @@ export default function App() {
   const { data, isLoading, error } = useQuery<FetchNotesResponse, Error>({
     queryKey: ["notes", { page, query: debouncedQuery }],
     queryFn: () => fetchNotes({ page, query: debouncedQuery, perPage: 12 }),
-    placeholderData: previousData =>
-      previousData && previousData.page !== page ? previousData : undefined,
+    placeholderData: keepPreviousData, // Використовуємо утиліту keepPreviousData
   });
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setPage(selectedItem.selected + 1);
   };
 
-  // Оновлений обробник для скидання сторінки при зміні пошукового запиту
   const handleSearchChange = (value: string) => {
     setPage(1); // Скидання сторінки на 1 при новому запиті
     setSearchQuery(value);
