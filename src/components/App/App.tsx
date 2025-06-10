@@ -6,7 +6,7 @@ import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
 import Pagination from "../Pagination/Pagination";
 import { fetchNotes } from "../../services/noteService";
-import type { FetchNotesResponse } from "../../types/note";
+import type { FetchNotesResponse } from "../../services/noteService";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import NoteModal from "../NoteModal/NoteModal";
@@ -22,17 +22,22 @@ export default function App() {
     queryFn: () => fetchNotes({ page, query: debouncedQuery, perPage: 12 }),
     placeholderData: previousData =>
       previousData && previousData.page !== page ? previousData : undefined,
-    // previousQuery та keepPreviousData не використовується у tanstack/react-query v5.+
   });
 
   const handlePageChange = (selectedItem: { selected: number }) => {
     setPage(selectedItem.selected + 1);
   };
 
+  // Оновлений обробник для скидання сторінки при зміні пошукового запиту
+  const handleSearchChange = (value: string) => {
+    setPage(1); // Скидання сторінки на 1 при новому запиті
+    setSearchQuery(value);
+  };
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox value={searchQuery} onChange={setSearchQuery} />
+        <SearchBox value={searchQuery} onChange={handleSearchChange} />
         {data && data.totalPages > 1 && (
           <Pagination
             pageCount={data.totalPages}

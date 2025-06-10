@@ -3,8 +3,7 @@ import * as Yup from "yup";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { createNote } from "../../services/noteService";
-import type { CreateNoteParams } from "../../types/note";
-import { useId } from "react";
+import type { CreateNoteParams } from "../../services/noteService";
 
 interface NoteFormProps {
   onClose: () => void;
@@ -21,14 +20,18 @@ const validationSchema = Yup.object({
 
 export default function NoteForm({ onClose }: NoteFormProps) {
   const queryClient = useQueryClient();
-  const titleId = useId();
-  const contentId = useId();
+  const titleId = "note-title";
+  const contentId = "note-content";
+  const tagId = "note-tag";
 
   const mutation = useMutation({
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       onClose();
+    },
+    onError: error => {
+      console.error("Mutation error:", error);
     },
   });
 
@@ -42,13 +45,13 @@ export default function NoteForm({ onClose }: NoteFormProps) {
     >
       {({ isSubmitting }) => (
         <Form className={css.form}>
-          <div className={css.formGroup} id={`${titleId}-wrapper`}>
+          <div className={css.formGroup} id={`${titleId}-wrapper`} aria-live="polite">
             <label htmlFor={titleId}>Title</label>
             <Field id={titleId} name="title" type="text" className={css.input} />
             <ErrorMessage name="title" component="span" className={css.error} />
           </div>
 
-          <div className={css.formGroup} id={`${contentId}-wrapper`}>
+          <div className={css.formGroup} id={`${contentId}-wrapper`} aria-live="polite">
             <label htmlFor={contentId}>Content</label>
             <Field
               id={contentId}
@@ -60,9 +63,9 @@ export default function NoteForm({ onClose }: NoteFormProps) {
             <ErrorMessage name="content" component="span" className={css.error} />
           </div>
 
-          <div className={css.formGroup}>
-            <label htmlFor="tag">Tag</label>
-            <Field id="tag" name="tag" as="select" className={css.select}>
+          <div className={css.formGroup} id={`${tagId}-wrapper`} aria-live="polite">
+            <label htmlFor={tagId}>Tag</label>
+            <Field id={tagId} name="tag" as="select" className={css.select}>
               <option value="Todo">Todo</option>
               <option value="Work">Work</option>
               <option value="Personal">Personal</option>
